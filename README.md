@@ -92,6 +92,14 @@ Explanation: This an empty graph, it does not have any nodes.
 
 ![](https://i.imgur.com/G5qc7jq.png)
 
+第2種作法是透過 DFS
+
+每次先建立當下的 copyNode 然後把新舊對應的透過 hashmap 紀錄下來
+
+然後當作完一輪後原本的 reference 就會自動建立好了
+
+![](https://i.imgur.com/k982kib.png)
+
 ## 程式碼
 ```go
 package sol
@@ -155,7 +163,33 @@ func cloneGraph(node *Node) *Node {
 	bfs(node)
 	return result
 }
+/**
+ * Definition for a Node.
+ * type Node struct {
+ *     Val int
+ *     Neighbors []*Node
+ * }
+ */
 
+func cloneGraphDFS(node *Node) *Node {
+	if node == nil {
+		return nil
+	}
+	oldToNew := make(map[*Node]*Node)
+	var dfs func(node *Node) *Node
+	dfs = func(node *Node) *Node {
+		if found, ok := oldToNew[node]; ok {
+			return found
+		}
+		newNode := &Node{Val: node.Val}
+		oldToNew[node] = newNode
+		for _, nei := range node.Neighbors {
+			newNode.Neighbors = append(newNode.Neighbors, dfs(nei))
+		}
+		return newNode
+	}
+	return dfs(node)
+}
 ```
 ## 困難點
 
